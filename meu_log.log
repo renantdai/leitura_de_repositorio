@@ -1,0 +1,2 @@
+2024-09-17 20:21:52,028 DEBUG Starting new HTTP connection (1): 127.0.0.1:8000
+2024-09-17 20:21:56,425 ERROR erro  HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/capture (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001DD54AAD6A0>: Failed to establish a new connection: [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente'))
