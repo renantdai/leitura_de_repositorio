@@ -1,4 +1,5 @@
 import os
+import time
 import base64
 from datetime import datetime
 from watchdog.events import FileSystemEventHandler
@@ -22,12 +23,21 @@ class ImageService(FileSystemEventHandler):
 
     def realizarEnviosManuais(self, event, path, listaImagens):
         for imagemPath in listaImagens:
-            event.src_path = path + "\\" +  imagemPath
+            event.src_path = path + "/" +  imagemPath #quando usado em WINDOWS utilizar contra barra dupla
             self.enviar(event)
             print("enviomanual-----------------")
         return True
 
     def enviar(self, event):
+        init_size = -1
+        while True: 
+            current_size = os.path.getsize(event.src_path)
+            if current_size == init_size:
+                break
+            else:
+                init_size = os.path.getsize(event.src_path)
+                time.sleep(1)
+
         body = self.process_image(event.src_path, self.id_cam)
         if body:
             request = requestApi(event, body)

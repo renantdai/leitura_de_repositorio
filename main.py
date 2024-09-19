@@ -58,6 +58,7 @@ def main():
 
     if len(observers) == 0:
         print("A lista está vazia")
+        exit()
 
     try:
         while True:
