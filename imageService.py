@@ -22,7 +22,7 @@ class ImageService(FileSystemEventHandler):
         return os.listdir(path)
 
     def realizarEnviosManuais(self, event, path, listaImagens):
-        logging.info(f"Iniciando o envio manual de " + len(listaImagens))
+        logging.info(f"Iniciando o envio manual de {len(listaImagens)}")
         for imagemPath in listaImagens:
             event.src_path = path + "/" +  imagemPath #quando usado em WINDOWS utilizar contra barra dupla
             self.enviar(event)
