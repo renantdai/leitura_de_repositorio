@@ -22,6 +22,7 @@ class ImageService(FileSystemEventHandler):
         return os.listdir(path)
 
     def realizarEnviosManuais(self, event, path, listaImagens):
+        logging.info(f"Iniciando o envio manual de " + len(listaImagens))
         for imagemPath in listaImagens:
             event.src_path = path + "/" +  imagemPath #quando usado em WINDOWS utilizar contra barra dupla
             self.enviar(event)
@@ -53,8 +54,8 @@ class ImageService(FileSystemEventHandler):
             return None
 
         date_str, time_str, plate, id_register = parts
-        if plate == "000000":
-            print(f"Plate is 000000, deleting image {image_path}.")
+        if plate == "000000" or plate =='_No Plate':
+            print(f"Plate is invalid, deleting image {image_path}.")
             os.remove(image_path)
             return None
 
