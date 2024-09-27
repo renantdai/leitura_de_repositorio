@@ -23,11 +23,16 @@ class ImageService(FileSystemEventHandler):
 
     def realizarEnviosManuais(self, event, path, listaImagens):
         logging.info(f"Iniciando o envio manual de {len(listaImagens)}")
-        for imagemPath in listaImagens:
-            event.src_path = path + "/" +  imagemPath #quando usado em WINDOWS utilizar contra barra dupla
-            self.enviar(event)
-            print("enviomanual-----------------")
-        return True
+        try:
+            for imagemPath in listaImagens:
+                event.src_path = path + "/" +  imagemPath #quando usado em WINDOWS utilizar contra barra dupla
+                self.enviar(event)
+                print("enviomanual-----------------")
+            logging.info(f"Encerrado o envio manual")
+            return True
+        except Exception as e:
+            logging.info(f"Erro ao percorrer as imagens da lista. {e}")
+            return False
 
     def enviar(self, event):
         init_size = -1
