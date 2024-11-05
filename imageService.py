@@ -1,3 +1,4 @@
+from PIL import Image
 import os
 import time
 import base64
@@ -25,7 +26,7 @@ class ImageService(FileSystemEventHandler):
         logging.info(f"Iniciando o envio manual de {len(listaImagens)}")
         try:
             for imagemPath in listaImagens:
-                event.src_path = path + "/" +  imagemPath #quando usado em WINDOWS utilizar contra barra dupla
+                event.src_path = path + "\\" +  imagemPath #quando usado em WINDOWS utilizar contra barra dupla
                 self.enviar(event)
                 print("enviomanual-----------------")
             logging.info(f"Encerrado o envio manual")
@@ -52,6 +53,8 @@ class ImageService(FileSystemEventHandler):
             return None
 
     def process_image(self, image_path, id_cam):
+        # Define o tamanho máximo permitido em bytes (500 KB)
+        max_size = 250 * 1024  
         filename = os.path.basename(image_path)
         parts = filename.split('_')
         if len(parts) != 4:
@@ -59,7 +62,7 @@ class ImageService(FileSystemEventHandler):
             return None
 
         date_str, time_str, plate, id_register = parts
-        if plate == "000000" or plate =='_No Plate':
+        if plate == "000000" or plate =='_No Plate' or plate =='No Plate':
             print(f"Plate is invalid, deleting image {image_path}.")
             os.remove(image_path)
             return None
@@ -75,6 +78,23 @@ class ImageService(FileSystemEventHandler):
                 if not image_data:
                     print(f"Failed to read image data from {image_path}.")
                     return None
+                # Se o tamanho da imagem for superior a 250 KB, redimensiona
+                if len(image_data) > max_size:
+                    print(f"Image {image_path} is larger than 250 KB, resizing...")
+                    image = Image.open(image_path)
+                    # Reduz progressivamente o tamanho da imagem até estar dentro do limite
+                    quality = 80
+                    while len(image_data) > max_size and quality > 30:
+                        image_file_resized_path = image_path.replace(".", "_resized.")
+                        image_file_resized_path = image_file_resized_path.replace('Cameras', 'Cameras/tmp/')
+                        image.save(image_file_resized_path, format=image.format, quality=quality)
+                        # Recarrega e verifica o tamanho do arquivo redimensionado
+                        with open(image_file_resized_path, "rb") as resized_file:
+                            image_data = resized_file.read()
+                        quality -= 5  # Reduz a qualidade em 5% em cada iteração para economizar espaço
+                    # Remove a imagem redimensionada temporária
+                    os.remove(image_file_resized_path)                
+
                 image_base64 = base64.b64encode(image_data).decode('utf-8')
                 print(f"Image {image_path} successfully converted to base64.")
         except Exception as e:

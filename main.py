@@ -3,6 +3,7 @@ import time
 from watchdog.observers import Observer
 from conexao import BancoDeDados
 from imageHandler import ImageHandler
+from removeImageObserver import RemoveImageObserver
 import json
 
 with open('parametros.json', 'r') as config_file:
@@ -23,6 +24,10 @@ def verificaDiretorio(path):
     enviados_path = os.path.join(path, 'enviados')
     if not os.path.exists(enviados_path):
         os.makedirs(enviados_path)
+
+    tmp_path = os.path.join(path, 'tmp')
+    if not os.path.exists(tmp_path):
+        os.makedirs(tmp_path)
     return True
 
 def leituraDiretorioEnvioManual(imageHandler, path):
@@ -40,6 +45,8 @@ def main():
         directories = parametros['diretorios']
 
     observers = []
+    remove_image_observers = []
+
     for directory in directories:
         dir_id, id_cam, path = directory
 
@@ -56,6 +63,11 @@ def main():
 
         realizarEnviosManuais(event_handler, path, listaImagens)
 
+        # Cria e inicia um novo observer para remover imagens
+        remove_observer = RemoveImageObserver(os.path.join(path, 'enviados'), 1)
+        remove_observer.iniciar_observer()
+        remove_image_observers.append(remove_observer)
+
     if len(observers) == 0:
         print("A lista está vazia")
         exit()
@@ -63,12 +75,15 @@ def main():
     try:
         while True:
             time.sleep(1)
-            pass
     except KeyboardInterrupt:
         for observer in observers:
             observer.stop()
+        for remove_observer in remove_image_observers:
+            remove_observer.observer.stop()  # Parar cada observer de remoção de imagem
     for observer in observers:
         observer.join()
+    for remove_observer in remove_image_observers:
+        remove_observer.observer.join()  # Juntar cada observer de remoção de imagem
 
 
 

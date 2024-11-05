@@ -21,7 +21,7 @@ class requestApi():
     def enviarImagem(self, enviados_path):
         try:
             print(f"Sending request for image {self.event.src_path}")
-            response = requests.post(config['url'], json=self.body)
+            response = requests.post(config['url'], json=self.body, timeout=10)
             if response.status_code == 200:
                 print(f"Image {self.event.src_path} sent successfully.")
                 os.rename(self.event.src_path, os.path.join(enviados_path, os.path.basename(self.event.src_path)))

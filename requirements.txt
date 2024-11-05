@@ -1,3 +1,5 @@
 requests
 watchdog
 mysql-connector-python
+Pillow
+schedule
