@@ -85,7 +85,7 @@ class ImageService(FileSystemEventHandler):
                     # Reduz progressivamente o tamanho da imagem até estar dentro do limite
                     quality = 80
                     while len(image_data) > max_size and quality > 30:
-                        image_file_resized_path = image_path.replace(".", "_resized.")
+                        image_file_resized_path = image_path
                         image_file_resized_path = image_file_resized_path.replace('Cameras', 'Cameras/tmp/')
                         image.save(image_file_resized_path, format=image.format, quality=quality)
                         # Recarrega e verifica o tamanho do arquivo redimensionado
