@@ -79,6 +79,7 @@ class ImageService(FileSystemEventHandler):
                     print(f"Failed to read image data from {image_path}.")
                     return None
                 # Se o tamanho da imagem for superior a 250 KB, redimensiona
+                """
                 if len(image_data) > max_size:
                     print(f"Image {image_path} is larger than 250 KB, resizing...")
                     image = Image.open(image_path)
@@ -94,7 +95,7 @@ class ImageService(FileSystemEventHandler):
                         quality -= 5  # Reduz a qualidade em 5% em cada iteração para economizar espaço
                     # Remove a imagem redimensionada temporária
                     os.remove(image_file_resized_path)                
-
+                """
                 image_base64 = base64.b64encode(image_data).decode('utf-8')
                 print(f"Image {image_path} successfully converted to base64.")
         except Exception as e:

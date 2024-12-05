@@ -3,7 +3,7 @@ import time
 from watchdog.observers import Observer
 from conexao import BancoDeDados
 from imageHandler import ImageHandler
-from removeImageObserver import RemoveImageObserver
+from cleanupHandler import CleanupHandler
 import json
 
 with open('parametros.json', 'r') as config_file:
@@ -63,10 +63,10 @@ def main():
 
         realizarEnviosManuais(event_handler, path, listaImagens)
 
-        # Cria e inicia um novo observer para remover imagens
-        remove_observer = RemoveImageObserver(os.path.join(path, 'enviados'), 1)
-        remove_observer.iniciar_observer()
-        remove_image_observers.append(remove_observer)
+        event_handler = CleanupHandler(os.path.join(path, 'enviados'), cleanup_interval=60)
+        observerRemocao = Observer()
+        observerRemocao.schedule(event_handler, os.path.join(path, 'enviados'), recursive=False)
+        observerRemocao.start()
 
     if len(observers) == 0:
         print("A lista está vazia")
@@ -78,13 +78,8 @@ def main():
     except KeyboardInterrupt:
         for observer in observers:
             observer.stop()
-        for remove_observer in remove_image_observers:
-            remove_observer.observer.stop()  # Parar cada observer de remoção de imagem
     for observer in observers:
         observer.join()
-    for remove_observer in remove_image_observers:
-        remove_observer.observer.join()  # Juntar cada observer de remoção de imagem
-
 
 
 if __name__ == "__main__":
